@@ -1,18 +1,13 @@
-import { Fugaz_One, Geist, Geist_Mono, Open_Sans } from "next/font/google";
+import { Fugaz_One, Open_Sans } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
+import { AuthProvider } from "@/context/AuthContext";
+import Head from "./head";
+import Logout from "@/components/Logout";
+
 
 const fugaz = Fugaz_One({ subsets: ["latin"], weight: ['400'] });
 const opensans = Open_Sans({ subsets: ["latin"]})
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "How Well",
@@ -22,8 +17,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   const header = (
     <header className="p-4 sm:p-8 flex items-center justify-between gap-4">
-      <h1 className={'text-base sm:text-lg textGradient ' + fugaz.className}>How Well</h1>
-      <div className="flex items-center justify-between"> PLACEHOLDER CTA || STATS</div>
+      <Link href={'/'}>
+        <h1 className={'text-base sm:text-lg textGradient ' + fugaz.className}>How Well</h1>
+      </Link>
+
+      <Logout/>
+     
+      {/* <div className="flex items-center justify-between"> PLACEHOLDER CTA || STATS</div> */}
     </header>
   )
   const footer = (
@@ -33,17 +33,17 @@ export default function RootLayout({ children }) {
   )
   return (
     <html lang="en">
-      <body
-        className={ 'w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen flex flex-col text-slate-800 ' + opensans.className  }
-        data-new-gr-c-s-check-loaded="14.1226.0"                        data-gr-ext-installed=""
-      >
-        {header}
-        {children}
-        {footer}
-      </body>
+      <Head/>
+      <AuthProvider>
+        <body
+          className={ 'w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen flex flex-col text-slate-800 ' + opensans.className  }
+          data-new-gr-c-s-check-loaded="14.1226.0"                        data-gr-ext-installed=""
+        >
+          {header}
+          {children}
+          {footer}
+        </body>
+      </AuthProvider>
     </html>
   );
 }
-
-
-// `${geistSans.variable} ${geistMono.variable} antialiased`
