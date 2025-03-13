@@ -1,8 +1,8 @@
 'use client' 
 // the line above ensures that next doesn't prebuild the page on the server side
 import { auth, db } from "@/firebase"
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth"
-import { doc, getDoc } from "firebase/firestore"
+import { createUserWithEmailAndPassword, deleteUser, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { deleteDoc, doc, getDoc } from "firebase/firestore"
 import React, {useContext, useState, useEffect} from "react"
 
 
@@ -32,6 +32,23 @@ export function AuthProvider({ children }) {
     return signOut(auth)
   }
 
+  async function deleteAccount() {
+    try {
+      if (!currentUser) {
+        return
+      }
+
+      const userDocRef = doc(db, 'users', currentUser.uid)
+      await deleteDoc(userDocRef)
+      await deleteUser(currentUser)
+
+      setUserDataObj(null);
+      setCurrentUser(null);
+    } catch(err) {
+      console.error('Error deleting account:', err.message);
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async user => {
       try {
@@ -39,23 +56,22 @@ export function AuthProvider({ children }) {
         setLoading(true)
         setCurrentUser(user)
         if (!user) {
-          console.log('no user found')
           return
         }
 
         // if user exists fetch data from firestore database
-        console.log('fetching user data')
+        // console.log('fetching user data')
         const docRef = doc(db, 'users', user.uid)
         const docSnap = await getDoc(docRef)
         let firebaseData = {}
         if (docSnap.exists()) {
-          console.log('found user data:')
+          // console.log('found user data:')
           firebaseData = docSnap.data()
-          console.log('firebasedata:', firebaseData)
+          // console.log('firebasedata:', firebaseData)
         }
         setUserDataObj(firebaseData)
       } catch(err) {
-        console.log(err.message)
+        // console.log(err.message)
       } finally {
         setLoading(false)
       }
@@ -70,6 +86,7 @@ export function AuthProvider({ children }) {
     signup,
     logout,
     login,
+    deleteAccount,
     loading
   }
 

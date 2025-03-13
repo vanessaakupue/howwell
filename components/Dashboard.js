@@ -30,7 +30,7 @@ export default function Dashboard() {
     }
     return {
       num_days: total_number_of_days, 
-      average_mood: (sum_moods / total_number_of_days).toFixed(1)
+      average_mood: (sum_moods ? (sum_moods / total_number_of_days).toFixed(1) : '0')
     }
   }
 
