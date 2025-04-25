@@ -3,7 +3,11 @@ import { Fugaz_One } from 'next/font/google';
 import React, {useState} from 'react'
 import Button from './Button';
 import { useAuth } from '@/context/AuthContext';
-import { getErrorMessage } from '@/utils/error';
+import { FcGoogle } from 'react-icons/fc';
+import { AiFillGithub } from 'react-icons/ai';
+import ResetPassword from './ResetPassword';
+// import { getErrorMessage } from '@/utils/error';
+
 
 const fugaz = Fugaz_One({ subsets: ["latin"], weight: ['400'] });
 
@@ -14,8 +18,15 @@ export default function Login() {
   const [Authenticating, setAuthenticating] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [showResetPassword, setShowResetPassword] = useState(false)
 
-  const {signup, login } = useAuth()
+  const {signup, login, signInWithGoogle, signInWithGithub } = useAuth()
+
+
+
+  if (showResetPassword) {
+    return <ResetPassword backToLogin={() => setShowResetPassword(false)} />
+  }
 
   const resetForm = () => {
     setIsRegister(!isRegister)
@@ -44,7 +55,25 @@ export default function Login() {
         await login(email, password)
       }
     } catch(err) {
-      setError(getErrorMessage(err.code))
+      console.log(err)
+      setError(err.message)
+    } finally {
+      setAuthenticating(false)
+    }
+  }
+
+  async function handleSocialAuth(provider) {
+    setAuthenticating(true)
+    setError('')
+
+    try {
+      if (provider === 'google') {
+        await signInWithGoogle()
+      } else if (provider === 'github') {
+        await signInWithGithub()
+      }
+    } catch(err) {
+      setError(err.message)
     } finally {
       setAuthenticating(false)
     }
@@ -58,13 +87,13 @@ export default function Login() {
       <input value={email} onChange={(e) => {
         setEmail(e.target.value)
         setError('')
-      }} className='w-full max-w-[400px] mx-auto px-3 duration-200 hover:border-indigo-600 focus:border-indigo-600  py-2 sm:py-3 border border-solid border-indigo-400 rounded-full outline-none' placeholder='Email' type="text" />
+      }} className='w-full max-w-[400px] mx-auto px-3 duration-200 hover:border-indigo-600 focus:border-indigo-600  py-2 sm:py-3 border border-solid border-indigo-400 rounded-full outline-none' placeholder='Email' type="text" required />
 
       <div className='relative w-full max-w-[400px] mx-auto'>
         <input value={password} onChange={(e) => {
         setPassword(e.target.value)
         setError('')
-        }} className='w-full px-3 duration-200 hover:border-indigo-600 focus:border-indigo-600  py-2 sm:py-3 border border-solid border-indigo-400 rounded-full outline-none' placeholder='Password' type={ showPassword ? "text" : "password"}  />
+        }} className='w-full px-3 duration-200 hover:border-indigo-600 focus:border-indigo-600  py-2 sm:py-3 border border-solid border-indigo-400 rounded-full outline-none' placeholder={isRegister ? 'Password: At least 7 characters' : 'Password'} type={ showPassword ? "text" : "password"} required />
         <button onClick={() => setShowPassword(!showPassword)}
           className='absolute right-5 top-3'>
           {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -82,6 +111,29 @@ export default function Login() {
         <Button clickHandler={handleSubmit} text={ Authenticating ? "Submitting" : "Submit"} full/>
       </div>
       <p className='text-center'>{ isRegister ? 'Already have an account? ' : 'Don\'t have an account? '} <button onClick={resetForm} className='text-indigo-600'>{ isRegister ? 'Sign in' : 'Sign Up'}</button></p>
+
+      
+      <button
+        className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2"
+        onClick={() => handleSocialAuth('google')}
+      >
+        <FcGoogle size={20}/>
+        Continue with Google
+      </button>
+      <button
+        className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2"
+        onClick={() => handleSocialAuth('github')}
+      >
+        <AiFillGithub size={20}/>
+        Continue with GitHub
+      </button>
+
+      {!isRegister && (
+        <button onClick={() => setShowResetPassword(true)} className='text-indigo-600'>Forgot password?</button>
+      )
+
+      }
+      
     </div>
   )
 }

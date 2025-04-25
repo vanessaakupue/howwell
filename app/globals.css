@@ -16,3 +16,9 @@
   transform: translate(3px, 3px );
   box-shadow: 0px 0px 1px 1px lavender;
 }
+
+.mood-text-outline {
+ -webkit-text-stroke: 1px white;  /* Safari/Chrome */
+  /* text-stroke: 1px white; Future standard */
+  paint-order: stroke fill; /* Stroke behind text */
+}

@@ -8,7 +8,9 @@ export const getErrorMessage = (errorCode) => {
       return 'This email is already in use. Please use a different email.';
     case 'auth/wrong-password':
       return 'Incorrect password. Please try again.';
-    default:
-      return 'An error occurred. Please try again later.';
+    case 'auth/invalid-credential':
+      return 'Invalid email or password. Please check your credentials and try again.';
+    // default:
+    //   return 'An error occurred. Please try again later.';
   }
 };
